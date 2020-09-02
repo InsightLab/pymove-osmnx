@@ -9,6 +9,7 @@ addons:
 
 script:
   - python setup.py sdist >/dev/null
+  - pip install pandas==1.0.5
   - python setup.py install
 
 deploy:
