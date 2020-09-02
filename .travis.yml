@@ -5,13 +5,13 @@ script:
   - python setup.py sdist >/dev/null
   - python setup.py install
 
-# deploy:
-#   skip_existing: true
-#   provider: pypi
-#   distributions: "sdist bdist_wheel"
-#   user: "__token__"
-#   password:
-#     secure: Cln487UPJR+jFHSRYtZfr/JJucJUKMS7GNCbtORV5Bz1rV/DZg8RLf4Em47EIPzRIsbHw9fYdU4Fh+CCOAWtiVRF/SJDfQ18PFlt8986WH1IVh8S8VfGOIMBoOPech2eOT5CtKzzT06+H2S4/qje4E6JgLf2KkuRc9zCv3l/Vbia4k0t0yX1Jneo1dhF17WmOeuO/jtlD9r1czed/lErfA5KB5OthA9HTDf+ulKI+jzZtZSbboU7W6kIn0Z1haj34iuZeRH9bFcxYKN2NyOfXiS2uoHCCVk7Jivj2vzGYaOdIico/XOQB3VC4kEBUpHcRLnJsxOd222wMcuKYGsATxb/wib6VgKJWZ0bLuxjrnBD4job4Id8PNpOJi3+52OitKxjPMPfXx1TrT/K9b+aIp2VYheUG2TnV15w2aeel8ORnoPss6GliquE/jaGgDZ91DH5hHbPaSQItYnOnf2IXYOAlDfTLeg/KVWR/LZdWLReEONI+UrUC+QPJiV03lUzvChKjoB4xAeZ0lomLHuDbI4ZI5V1Dn2UfMTB5Ri3v/njbRqw9t25+ZI3RZ2IaFbpee8Tpwu3D37Bqs62gQf/jcQiFOqOOUjajsOHhZQsRF9KH2e6IM68frlfTr/dOpqn5ijmKf+Hjr26z+ILtQV0gSM6Yv3wgMgBhLLM4+8L/A4=
-#   on:
-#     tags: true
-#     branch: master
+deploy:
+  skip_existing: true
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  user: "__token__"
+  password:
+    secure: SXbJZtN0vZfWW4Dwa/MumAhpG9iplAv+/9uuTpaxqU0OvYIejDk/AC8ucUbgZrhUoxuKu32bArp7Gl/36eyERgI4ZpIqzie6zVUgIbvNJiGc6yxJDU6zKIneQR1Ezf0x9sQfsSqQ3FChS3WWDQB3jRxuS32/y8f0ZzMWhBfa6M7jt0HTk1YFEZZnXuQdAjUWFnwDNRQ1xjrLSGW1hDuvqU8XkniUND9LvUSgw5OBG4sNbpmWF7+AeOCU8e6h97mb5rFRcZXcmzsR53/kP3QjvoX1NkRNxF7eDHpfNKIGJZeOoG3yjYGouKuOyLG1E85tgZoZc/mSo4Iw7gbEemUPHjtlT0ABQbTfYsvmuSMzHQ/NSIXlXEvUC9CgYJtrQKbDipAyfRyV2FOEe5NF7njgCuPpMvy7z8Znl38tXAtHHND+atRs9UbtvK26DoqZW7nNL8ukGVqaDKNPP+UQtCmKLbpp95/9YPzlcnYQ6Nr1H+/Njr3NHz5uuIsfJUd1HjWf/wKRebIcX/O2ZbNAH502sUMwtQaGQNsC+kOuseYvXUjsxOWWbJLXqg0I7ECwqkqqhW1ZeGOb/UlvVonJZzOwNElopK4g2kmnVcs+GJWIaTJyqXDMloQ6ajLbZdkRX94vN64KYXoORjB/tx/5AEVwbpG8/wNHzn7955+JRWe5uDE=
+  on:
+    tags: true
+    branch: master
