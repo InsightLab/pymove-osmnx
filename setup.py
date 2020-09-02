@@ -21,8 +21,7 @@ setup(
     author_email='insightlab@dc.ufc.br',
     license='MIT',
     python_requires='>=3.6',
-    description='A lib python to processing and visualization '
-                'of trajectories and other spatial-temporal data',
+    description='A lib python to integrate PyMove and OSMnx',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/InsightLab/pymove-osmnx',
