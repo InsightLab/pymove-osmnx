@@ -15,7 +15,7 @@ DEPENDENCIES = [
 ]
 setup(
     name='pymove-osmnx',
-    version='1.0.0',
+    version='0.1.0',
     author='Insight Data Science Lab',
     author_email='insightlab@dc.ufc.br',
     license='MIT',
@@ -29,7 +29,7 @@ setup(
         'pymove-osmnx'
     ],
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 1 - Planning',
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
