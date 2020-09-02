@@ -1,8 +1,13 @@
 language: python
 python: '3.6'
 
+before_install:
+  - sudo apt-get -y install libspatialindex-dev # necessary for osmnx pip instalation
+addons:
+  apt:
+    update: true
+
 script:
-  - sudo apt install libspatialindex-dev # necessary for osmnx pip instalation
   - python setup.py sdist >/dev/null
   - python setup.py install
 
