@@ -1,4 +1,4 @@
-# PyMove OSM NetworkX (OSMncx)
+# PyMove OSM NetworkX (OSMnx)
 
 ## What is PyMove-OSMnx
 

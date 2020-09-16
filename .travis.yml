@@ -1,0 +1,25 @@
+language: python
+python: '3.6'
+
+before_install:
+  - sudo apt-get -y install libspatialindex-dev # necessary for osmnx pip instalation
+  - pip install pandas==1.0.5
+  - pip install -U certifi
+addons:
+  apt:
+    update: true
+
+script:
+  - python setup.py sdist >/dev/null
+  - python setup.py install
+
+deploy:
+  skip_existing: true
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  user: "__token__"
+  password:
+    secure: SXbJZtN0vZfWW4Dwa/MumAhpG9iplAv+/9uuTpaxqU0OvYIejDk/AC8ucUbgZrhUoxuKu32bArp7Gl/36eyERgI4ZpIqzie6zVUgIbvNJiGc6yxJDU6zKIneQR1Ezf0x9sQfsSqQ3FChS3WWDQB3jRxuS32/y8f0ZzMWhBfa6M7jt0HTk1YFEZZnXuQdAjUWFnwDNRQ1xjrLSGW1hDuvqU8XkniUND9LvUSgw5OBG4sNbpmWF7+AeOCU8e6h97mb5rFRcZXcmzsR53/kP3QjvoX1NkRNxF7eDHpfNKIGJZeOoG3yjYGouKuOyLG1E85tgZoZc/mSo4Iw7gbEemUPHjtlT0ABQbTfYsvmuSMzHQ/NSIXlXEvUC9CgYJtrQKbDipAyfRyV2FOEe5NF7njgCuPpMvy7z8Znl38tXAtHHND+atRs9UbtvK26DoqZW7nNL8ukGVqaDKNPP+UQtCmKLbpp95/9YPzlcnYQ6Nr1H+/Njr3NHz5uuIsfJUd1HjWf/wKRebIcX/O2ZbNAH502sUMwtQaGQNsC+kOuseYvXUjsxOWWbJLXqg0I7ECwqkqqhW1ZeGOb/UlvVonJZzOwNElopK4g2kmnVcs+GJWIaTJyqXDMloQ6ajLbZdkRX94vN64KYXoORjB/tx/5AEVwbpG8/wNHzn7955+JRWe5uDE=
+  on:
+    tags: true
+    branch: master
