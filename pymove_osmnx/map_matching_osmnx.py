@@ -40,6 +40,9 @@ def map_matching_node(
         G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
     elif(place != None):
         G = ox.footprints_from_place(place=place, network_type='all_private')
+    
+    if not inplace:
+        move_data = move_data[:]
 
     nodes = ox.get_nearest_nodes(G,X=move_data['lon'],Y=move_data['lat'], method='kdtree')
 
@@ -49,7 +52,7 @@ def map_matching_node(
     move_data['lat'] = list(df_nodes.y)
     move_data['lon'] = list(df_nodes.x)
     move_data['geometry'] = list(df_nodes.geometry)
-    
+
     if not inplace:
         return move_data
 
@@ -88,6 +91,9 @@ def map_matching_edge(
         G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
     elif(place != None):
         G = ox.footprints_from_place(place=place, network_type='all_private')   
+    
+    if not inplace:
+        move_data = move_data[:]
     
     edges = ox.get_nearest_edges(G,X=move_data['lon'],Y=move_data['lat'], method='kdtree')
     gdf_edges = ox.graph_to_gdfs(G, nodes=False)

@@ -8,7 +8,7 @@ from pymove.utils.constants import TID
 from pymove.utils.log import progress_bar
 from pymove.utils.trajectories import shift
 from pymove.utils.transformations import feature_values_using_filter
-
+import osmnx as ox
 
 def check_time_dist(
      move_data,
@@ -63,7 +63,7 @@ def check_time_dist(
         if move_data.index.name is None:
             print("creating index...")
             move_data.set_index(index_name, inplace=True)
-       
+
         for tid in progress_bar(
             tids, desc="checking ascending distance and time"
         ):
@@ -91,7 +91,7 @@ def check_time_dist(
             dists = move_data.at[tid, "distFromTrajStartToCurrPoint"][filter_]
             delta_dists = (shift(dists, -1) - dists)[
                 :-1
-            ] 
+            ]
 
             assert np.all(
                 delta_dists <= max_dist_between_adj_points
@@ -400,7 +400,7 @@ def interpolate_add_deltatime_speed_features(
                 x2_[1:] >= x2_[:-1]
             ), "distances in nodes are not in ascending order"
 
-            intp_result = f_intp(x2_)  
+            intp_result = f_intp(x2_)
             assert np.all(
                 intp_result[1:] >= intp_result[:-1]
             ), "resulting times are not in ascending order"
@@ -425,7 +425,7 @@ def interpolate_add_deltatime_speed_features(
             feature_values_using_filter(
                 move_data, tid, "delta_time", filter_nodes, values
             )
-            
+
             move_data['datetime'] = None
             datetime = []
             for d in move_data['time'].values:
@@ -468,10 +468,10 @@ def interpolate_add_deltatime_speed_features(
         return move_data
 
 def generate_distances(
-	move_data,
-	inplace=True
+    move_data,
+    inplace=True
 ):
-	"""Use generate columns distFromTrajStartToCurrPoint and edgeDistance.
+    """Use generate columns distFromTrajStartToCurrPoint and edgeDistance.
      Parameters
     ----------
     move_data : dataframe
@@ -487,9 +487,12 @@ def generate_distances(
         None
             When inplace is True
     """
+    if not inplace:
+        move_data = move_data[:]
+
     MoveDataFrame(move_data)
     bbox = move_data.get_bbox()
-    G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')    
+    G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
     nodes = ox.get_nearest_nodes(G, X=move_data['lon'],Y=move_data['lat'], method='kdtree')
 
     distances = []
@@ -498,23 +501,23 @@ def generate_distances(
     node_ant = nodes[0]
 
     gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
-    
+
     for data in df.values:
         df_u = gdf_edges[gdf_edges['u'].values == node_ant]
         df_edge = df_u[df_u['v'] == data[1]]
-        
+
         if(len(distances) == 0):
-            distances.append(dist) 
+            distances.append(dist)
             edgeDistance.append(dist)
-        else:    
+        else:
             dist += df_edge['length'].values[0]
             distances.append(dist)
             edgeDistance.append(df_edge['length'].values[0])
-                         
+
         node_ant = data[1]
-    
+
     df['edgeDistance'] = edgeDistance
     df['distFromTrajStartToCurrPoint'] = distances
 
     if not inplace:
-    	return move_data
+        return move_data
