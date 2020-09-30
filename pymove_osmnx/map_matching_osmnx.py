@@ -7,7 +7,10 @@ from pymove.core.dataframe import MoveDataFrame
 
 def map_matching_node(
     move_data, 
-    inplace=True
+    inplace=True,
+    bbox=None,
+    place=None,
+    G=None
 ):
     """Generate Map matching.
      Parameters
@@ -17,20 +20,32 @@ def map_matching_node(
     inplace: boolean, optional(True by default)
         if set to true the original dataframe will be altered,
         otherwise the alteration will be made in a copy, that will be returned.
+    bbox : tuple
+        The bounding box as (north, east, south, west) 
+    place : string
+        The query to geocode to get place boundary polygon
+    G : networkx.MultiDiGraph
+        The input graph
 
     Returns
     -------
-        move_data : dataframe
+        move_data : MoveDataFrame
             A copy of the original dataframe, with the alterations done by the function. (When inplace is False)
         None
             When inplace is True
     """
-    
-    bbox = move_data.get_bbox()
-    G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')    
+    if(G == None):
+        if(bbox == None):
+            bbox = move_data.get_bbox()
+        G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
+    elif(place != None):
+        G = ox.footprints_from_place(place=place, network_type='all_private')
+
     nodes = ox.get_nearest_nodes(G,X=move_data['lon'],Y=move_data['lat'], method='kdtree')
+
     gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
     df_nodes = gdf_nodes.loc[nodes]
+
     move_data['lat'] = list(df_nodes.y)
     move_data['lon'] = list(df_nodes.x)
     move_data['geometry'] = list(df_nodes.geometry)
@@ -40,7 +55,10 @@ def map_matching_node(
 
 def map_matching_edge(
     move_data, 
-    inplace=True
+    inplace=True,
+    bbox=None,
+    place=None,
+    G=None
 ):
     """Generate Map matching.
      Parameters
@@ -50,20 +68,37 @@ def map_matching_edge(
     inplace: boolean, optional(True by default)
         if set to true the original dataframe will be altered,
         otherwise the alteration will be made in a copy, that will be returned.
+    bbox : tuple
+        The bounding box as (north, east, south, west) 
+    place : string
+        The query to geocode to get place boundary polygon
+    G : networkx.MultiDiGraph
+        The input graph
 
     Returns
     -------
-        move_data : dataframe
+        move_data : MoveDataFrame
             A copy of the original dataframe, with the alterations done by the function. (When inplace is False)
         None
             When inplace is True
     """
-    bbox = move_data.get_bbox()
-    G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')    
+    if(G == None):
+        if(bbox == None):
+            bbox = move_data.get_bbox()
+        G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
+    elif(place != None):
+        G = ox.footprints_from_place(place=place, network_type='all_private')   
+    
     edges = ox.get_nearest_edges(G,X=move_data['lon'],Y=move_data['lat'], method='kdtree')
+    gdf_edges = ox.graph_to_gdfs(G, nodes=False)
+    
+    geometrys = []
+    for e in edges:
+        df_edges = gdf_edges[(gdf_edges['u'] == e[0]) & (gdf_edges['v'] == e[1])]
+        geometrys.append(df_edges['geometry'])
 
-    move_data['edge'] = edges
-    move_data['edge'].apply(tuple)
+    move_data['edge'] = [*map(lambda x: tuple([x[0], x[1]]), edges)]
+    move_data['geometry'] = geometrys
 
     if not inplace:
         return move_data
