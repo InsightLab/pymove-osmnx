@@ -487,37 +487,38 @@ def generate_distances(
         None
             When inplace is True
     """
-    if not inplace:
-        move_data = move_data[:]
+    # if not inplace:
+    #     move_data = move_data[:]
 
-    MoveDataFrame(move_data)
-    bbox = move_data.get_bbox()
-    G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
-    nodes = ox.get_nearest_nodes(G, X=move_data['lon'],Y=move_data['lat'], method='kdtree')
+    # MoveDataFrame(move_data)
+    # bbox = move_data.get_bbox()
+    # G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
+    # nodes = ox.get_nearest_nodes(G, X=move_data['lon'],Y=move_data['lat'], method='kdtree')
 
-    distances = []
-    edgeDistance = []
-    dist = 0.0
-    node_ant = nodes[0]
+    # distances = []
+    # edgeDistance = []
+    # dist = 0.0
+    # node_ant = nodes[0]
 
-    gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
+    # gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
+    
+    # for data in df.values:
+    #     df_u = gdf_edges[gdf_edges['u'].values == node_ant]
+    #     df_edge = df_u[df_u['v'] == data[1]]
+        
+    #     if(len(distances) == 0):
+    #         distances.append(dist) 
+    #         edgeDistance.append(dist)
+    #     else:    
+    #         dist += df_edge['length'].values[0]
+    #         distances.append(dist)
+    #         edgeDistance.append(df_edge['length'].values[0])
+                         
+    #     node_ant = data[1]
+    
+    # df['edgeDistance'] = edgeDistance
+    # df['distFromTrajStartToCurrPoint'] = distances
 
-    for data in df.values:
-        df_u = gdf_edges[gdf_edges['u'].values == node_ant]
-        df_edge = df_u[df_u['v'] == data[1]]
-
-        if(len(distances) == 0):
-            distances.append(dist)
-            edgeDistance.append(dist)
-        else:
-            dist += df_edge['length'].values[0]
-            distances.append(dist)
-            edgeDistance.append(df_edge['length'].values[0])
-
-        node_ant = data[1]
-
-    df['edgeDistance'] = edgeDistance
-    df['distFromTrajStartToCurrPoint'] = distances
-
-    if not inplace:
-        return move_data
+    # if not inplace:
+    # 	return move_data
+    return

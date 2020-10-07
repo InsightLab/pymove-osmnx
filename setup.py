@@ -26,7 +26,9 @@ setup(
     long_description_content_type='text/markdown',
     url='https://github.com/InsightLab/pymove-osmnx',
     packages=[
-        'pymove_osmnx'
+        'pymove_osmnx',
+        'pymove_osmnx.core',
+        'pymove_osmnx.utils'
     ],
     classifiers=[
         'Development Status :: 1 - Planning',

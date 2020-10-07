@@ -4,7 +4,7 @@ import networkx as nx
 import osmnx as ox
 import numpy as np
 from difflib import SequenceMatcher 
-from pymove_osmnx.map_matching_osmnx import map_matching_edge
+from pymove_osmnx.core.map_matching_osmnx import map_matching_edge
 
 def generate_lcss(
     move_data_id1, 
