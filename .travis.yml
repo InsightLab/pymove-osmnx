@@ -3,8 +3,6 @@ python: '3.6'
 
 before_install:
   - sudo apt-get -y install libspatialindex-dev # necessary for osmnx pip instalation
-  - pip install pandas==1.0.5
-  - pip install -U certifi
 addons:
   apt:
     update: true
@@ -12,6 +10,9 @@ addons:
 script:
   - python setup.py sdist >/dev/null
   - python setup.py install
+  - pip install pytest
+  - pip install coverage
+  - coverage run -m pytest
 
 deploy:
   skip_existing: true
