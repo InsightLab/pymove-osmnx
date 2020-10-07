@@ -5,6 +5,6 @@ Provides processing, map matching and visualization of trajectories and other
 spatial-temporal data
 """
 
-from . import interpolate
-from . import LongestCommonSubSequence
-from . import map_matching_osmnx
+from .utils import interpolate
+from .utils import LongestCommonSubSequence
+from .core import map_matching_osmnx
