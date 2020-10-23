@@ -8,20 +8,26 @@ from shapely.geometry.point import Point
 from pymove.core.dataframe import MoveDataFrame
 from pymove_osmnx.core.map_matching_osmnx import map_matching_node
 
-dict_data = { 'id':  [1, 1, 1, 1],
-              'lat': [-3.779936, -3.779240, -3.778692, -3.778191], 
-              'lon': [-38.67921, -38.678747, -38.678440, -38.678071],
-              'datetime': ['2008-06-12 12:00:50', '2008-06-12 12:00:56', '2008-06-12 12:01:01', '2008-06-12 12:01:06']
+dict_data = {
+    'id':  [1, 1, 1, 1],
+    'lat': [-3.779936, -3.779240, -3.778692, -3.778191],
+    'lon': [-38.67921, -38.678747, -38.678440, -38.678071],
+    'datetime': [
+        '2008-06-12 12:00:50',
+        '2008-06-12 12:00:56',
+        '2008-06-12 12:01:01',
+        '2008-06-12 12:01:06'
+    ]
 }
 
 def test_map_matching_node():
-	move_df = MoveDataFrame(
+    move_df = MoveDataFrame(
         data=dict_data
     )
 
-	map_matching_node(move_df)
+    map_matching_node(move_df)
 
-	cols = [
+    cols = [
         'id',
         'lat',
         'lon',
@@ -29,11 +35,11 @@ def test_map_matching_node():
         'geometry'
     ]
 
-	expected = DataFrame(
+    expected = DataFrame(
         data=[
             [
                 1,
-                -3.779240,	
+                -3.779240,
                 -38.678747,
                 Timestamp('2008-06-12 12:00:50'),
                 Point(-38.6787469, -3.7792405),
@@ -64,7 +70,7 @@ def test_map_matching_node():
         index=[0, 1, 2, 3],
     )
 
-	assert_frame_equal(move_df, expected)
-	
-	assert move_df.len() == 4
+    assert_frame_equal(move_df, expected)
+
+    assert move_df.len() == 4
 
