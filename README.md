@@ -18,4 +18,3 @@ PyMove-OSMnx **proposes**:
 -   Operations for data preprocessing, pattern mining and data visualization.
 
 ---
-

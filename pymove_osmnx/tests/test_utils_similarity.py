@@ -1,25 +1,9 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-import networkx as nx
-import osmnx as ox
-import numpy as np
-import time
-from difflib import SequenceMatcher
-import zipfile
-from pymove.core.dataframe import MoveDataFrame
-from pymove.core.grid import Grid
-from pymove.preprocessing import filters
-from pymove.utils import trajectories
-from pymove.utils.constants import (
-    DATETIME,
-    LATITUDE,
-    LONGITUDE,
-    TRAJ_ID,
-)
 from pandas import DataFrame, Timestamp
-from pymove_osmnx.utils.similarity import generate_lcss
 from pandas.testing import assert_frame_equal
+from pymove.core.dataframe import MoveDataFrame
+from pymove.utils.constants import DATETIME, LATITUDE, LONGITUDE, TRAJ_ID
 
+from pymove_osmnx.utils.similarity import generate_lcss
 
 list_data = [
     [-3.83613, -38.49421, '2019-06-05 06:57:42', 1],
@@ -120,4 +104,3 @@ def test_lcss():
 
     assert_frame_equal(move_lcss, expected)
     assert len(move_lcss) == 4
-

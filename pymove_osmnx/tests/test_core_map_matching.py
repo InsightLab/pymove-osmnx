@@ -1,11 +1,8 @@
-import pandas as pd
-import networkx as nx
-import osmnx as ox
-import numpy as np
 from pandas import DataFrame, Timestamp
 from pandas.testing import assert_frame_equal
-from shapely.geometry.point import Point
 from pymove.core.dataframe import MoveDataFrame
+from shapely.geometry.point import Point
+
 from pymove_osmnx.core.map_matching_osmnx import map_matching_node
 
 dict_data = {
@@ -73,4 +70,3 @@ def test_map_matching_node():
     assert_frame_equal(move_df, expected)
 
     assert move_df.len() == 4
-
