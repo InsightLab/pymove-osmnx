@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import time
 from scipy.interpolate import interp1d
+import osmnx as ox
+from pandas import DataFrame
 
 from pymove.core.dataframe import MoveDataFrame
 from pymove.utils.constants import TID
@@ -16,8 +18,7 @@ def check_time_dist(
      tids=None,
      max_dist_between_adj_points=5000,
      max_time_between_adj_points=900,
-     max_speed=30,
-     inplace=True,
+     max_speed=30
  ):
     """
     Used to verify that the trajectories points are in the correct order after
@@ -48,10 +49,6 @@ def check_time_dist(
      None
          When inplace is True
     """
-
-    if not inplace:
-        move_data = MoveDataFrame(data=move_data.to_data_frame())
-
     try:
         if move_data.index.name is not None:
             print("reseting index...")
@@ -63,7 +60,9 @@ def check_time_dist(
         if move_data.index.name is None:
             print("creating index...")
             move_data.set_index(index_name, inplace=True)
-       
+        
+        move_data['isNone'] = move_data['datetime'].isnull()
+        
         for tid in progress_bar(
             tids, desc="checking ascending distance and time"
         ):
@@ -117,12 +116,11 @@ def check_time_dist(
             count += size_id
 
         move_data.reset_index(inplace=True)
-        if not inplace:
-            return move_data
+
+        return True
 
     except Exception as e:
         raise e
-
 
 def fix_time_not_in_ascending_order_id(
     move_data, tid, index_name="tid", inplace=True
@@ -163,6 +161,8 @@ def fix_time_not_in_ascending_order_id(
     if move_data.index.name is None:
         print("creating index...")
         move_data.set_index(index_name, inplace=True)
+
+    move_data['isNone'] = move_data['datetime'].isnull()
 
     filter_ = (move_data.at[tid, "isNone"] == True) & (
         ~move_data.at[tid, "deleted"]
@@ -240,6 +240,7 @@ def fix_time_not_in_ascending_order_all(
             print("reseting index...")
             move_data.reset_index(inplace=True)
 
+        move_data['isNone'] = move_data['datetime'].isnull()
         print("dropping duplicate distances... shape before:", move_data.shape)
         move_data.drop_duplicates(
             subset=[index_name, "isNone", "distFromTrajStartToCurrPoint"],
@@ -322,6 +323,7 @@ def interpolate_add_deltatime_speed_features(
         move_data.reset_index(inplace=True)
 
     tids = move_data[label_tid].unique()
+    move_data['isNone'] = move_data['datetime'].isnull()
 
     if move_data.index.name is None:
         print("creating index...")
@@ -468,10 +470,10 @@ def interpolate_add_deltatime_speed_features(
         return move_data
 
 def generate_distances(
-	move_data,
-	inplace=True
+move_data,
+inplace=False
 ):
-	"""Use generate columns distFromTrajStartToCurrPoint and edgeDistance.
+    """Use generate columns distFromTrajStartToCurrPoint and edgeDistance.
      Parameters
     ----------
     move_data : dataframe
@@ -487,34 +489,38 @@ def generate_distances(
         None
             When inplace is True
     """
-    # MoveDataFrame(move_data)
-    # bbox = move_data.get_bbox()
-    # G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')    
-    # nodes = ox.get_nearest_nodes(G, X=move_data['lon'],Y=move_data['lat'], method='kdtree')
+    move_data = MoveDataFrame(move_data)
+    bbox = move_data.get_bbox()
 
-    # distances = []
-    # edgeDistance = []
-    # dist = 0.0
-    # node_ant = nodes[0]
+    G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3])    
+    nodes = ox.get_nearest_nodes(G, X=move_data['lon'],Y=move_data['lat'], method='kdtree')
 
-    # gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
+    distances = []
+    edgeDistance = []
+    dist = 0.0
+    node_ant = nodes[0]
+    distances.append(dist) 
+    edgeDistance.append(dist)
+
+    gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
     
-    # for data in df.values:
-    #     df_u = gdf_edges[gdf_edges['u'].values == node_ant]
-    #     df_edge = df_u[df_u['v'] == data[1]]
+    for node in nodes[1:]:
+        df_u = gdf_edges[gdf_edges['u'].values == node_ant]
+        df_edge = df_u[df_u['v'] == node]
+     
+        if(len(df_edge) == 0):
+            dist += 0
+            edgeDistance.append(dist)
+        else:
+            dist += df_edge['length'].values[0]
+            edgeDistance.append(df_edge['length'].values[0])
+        distances.append(dist)
         
-    #     if(len(distances) == 0):
-    #         distances.append(dist) 
-    #         edgeDistance.append(dist)
-    #     else:    
-    #         dist += df_edge['length'].values[0]
-    #         distances.append(dist)
-    #         edgeDistance.append(df_edge['length'].values[0])
-                         
-    #     node_ant = data[1]
-    
-    # df['edgeDistance'] = edgeDistance
-    # df['distFromTrajStartToCurrPoint'] = distances
 
-    # if not inplace:
-    # 	return move_data
+        node_ant = node
+    
+    move_data['edgeDistance'] = edgeDistance
+    move_data['distFromTrajStartToCurrPoint'] = distances
+
+    if not inplace:
+        return move_data
