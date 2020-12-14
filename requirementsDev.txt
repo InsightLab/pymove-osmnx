@@ -1,0 +1,5 @@
+-e .
+pre-commit
+bump2version
+pytest
+coverage

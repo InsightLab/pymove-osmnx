@@ -11,7 +11,8 @@ except Exception as e:
 
 DEPENDENCIES = [
     'pymove',
-    'osmnx'
+    'pandas==1.0.5',
+    'osmnx<=0.15.1'
 ]
 
 setup(

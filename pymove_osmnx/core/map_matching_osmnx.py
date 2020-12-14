@@ -1,12 +1,8 @@
-import pandas as pd
-import networkx as nx
 import osmnx as ox
-import numpy as np
-from pymove.core.dataframe import MoveDataFrame
 
 
 def map_matching_node(
-    move_data, 
+    move_data,
     inplace=True,
     bbox=None,
     place=None,
@@ -21,7 +17,7 @@ def map_matching_node(
         if set to true the original dataframe will be altered,
         otherwise the alteration will be made in a copy, that will be returned.
     bbox : tuple
-        The bounding box as (north, east, south, west) 
+        The bounding box as (north, east, south, west)
     place : string
         The query to geocode to get place boundary polygon
     G : networkx.MultiDiGraph
@@ -41,6 +37,9 @@ def map_matching_node(
     elif(place != None):
         G = ox.footprints_from_place(place=place, network_type='all_private')
 
+    if not inplace:
+        move_data = move_data[:]
+
     nodes = ox.get_nearest_nodes(G,X=move_data['lon'],Y=move_data['lat'], method='kdtree')
 
     gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
@@ -49,12 +48,12 @@ def map_matching_node(
     move_data['lat'] = list(df_nodes.y)
     move_data['lon'] = list(df_nodes.x)
     move_data['geometry'] = list(df_nodes.geometry)
-    
+
     if not inplace:
         return move_data
 
 def map_matching_edge(
-    move_data, 
+    move_data,
     inplace=True,
     bbox=None,
     place=None,
@@ -69,7 +68,7 @@ def map_matching_edge(
         if set to true the original dataframe will be altered,
         otherwise the alteration will be made in a copy, that will be returned.
     bbox : tuple
-        The bounding box as (north, east, south, west) 
+        The bounding box as (north, east, south, west)
     place : string
         The query to geocode to get place boundary polygon
     G : networkx.MultiDiGraph
@@ -87,11 +86,14 @@ def map_matching_edge(
             bbox = move_data.get_bbox()
         G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
     elif(place != None):
-        G = ox.footprints_from_place(place=place, network_type='all_private')   
-    
+        G = ox.footprints_from_place(place=place, network_type='all_private')
+
+    if not inplace:
+        move_data = move_data[:]
+
     edges = ox.get_nearest_edges(G,X=move_data['lon'],Y=move_data['lat'], method='kdtree')
     gdf_edges = ox.graph_to_gdfs(G, nodes=False)
-    
+
     geometrys = []
     for e in edges:
         df_edges = gdf_edges[(gdf_edges['u'] == e[0]) & (gdf_edges['v'] == e[1])]

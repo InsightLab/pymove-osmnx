@@ -1,14 +1,13 @@
-import matplotlib.pyplot as plt
+from difflib import SequenceMatcher
+
 import pandas as pd
-import networkx as nx
-import osmnx as ox
-import numpy as np
-from difflib import SequenceMatcher 
+
 from pymove_osmnx.core.map_matching_osmnx import map_matching_edge
 
+
 def generate_lcss(
-    move_data_id1, 
-    move_data_id2, 
+    move_data_id1,
+    move_data_id2,
     tolerance
 ):
     """Generate Longest Commum Sub-Sequence between two trajectories.
@@ -18,7 +17,7 @@ def generate_lcss(
        The input trajectories data
     move_data_id2 : MoveDataFrame
        The input trajectories data
-    tolerance : int 
+    tolerance : int
         Time in seconds regarding the tolerance of the time difference between a move_data_id1 and move_data_id2 point
 
     Returns
@@ -32,9 +31,9 @@ def generate_lcss(
     move_data_id1 = map_matching_edge(move_data_id1, inplace=False)
     move_data_id2 = map_matching_edge(move_data_id2, inplace=False)
 
-    seqMatch = SequenceMatcher(None,list(move_data_id1['edge']), list(move_data_id2['edge'])) 
-      
-    matchs = seqMatch.get_matching_blocks() 
+    seqMatch = SequenceMatcher(None,list(move_data_id1['edge']), list(move_data_id2['edge']))
+
+    matchs = seqMatch.get_matching_blocks()
     df_mat = pd.DataFrame(matchs)
     df_mat.sort_values(['size'], ascending=False, inplace=True)
 
