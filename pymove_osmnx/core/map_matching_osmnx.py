@@ -26,23 +26,28 @@ def map_matching_node(
     Returns
     -------
         move_data : MoveDataFrame
-            A copy of the original dataframe, with the alterations done by the function. (When inplace is False)
+            A copy of the original dataframe, with the alterations done by the function.
+            (When inplace is False)
         None
             When inplace is True
     """
-    if(G == None):
-        if(bbox == None):
+    if(G is None):
+        if(bbox is None):
             bbox = move_data.get_bbox()
-        G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
-    elif(place != None):
+        G = ox.graph_from_bbox(
+            bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private'
+        )
+    elif(place is not None):
         G = ox.footprints_from_place(place=place, network_type='all_private')
 
     if not inplace:
         move_data = move_data[:]
 
-    nodes = ox.get_nearest_nodes(G,X=move_data['lon'],Y=move_data['lat'], method='kdtree')
+    nodes = ox.get_nearest_nodes(
+        G, X=move_data['lon'], Y=move_data['lat'], method='kdtree'
+    )
 
-    gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
+    gdf_nodes = ox.graph_to_gdfs(G, edges=False)
     df_nodes = gdf_nodes.loc[nodes]
 
     move_data['lat'] = list(df_nodes.y)
@@ -51,6 +56,7 @@ def map_matching_node(
 
     if not inplace:
         return move_data
+
 
 def map_matching_edge(
     move_data,
@@ -77,30 +83,35 @@ def map_matching_edge(
     Returns
     -------
         move_data : MoveDataFrame
-            A copy of the original dataframe, with the alterations done by the function. (When inplace is False)
+            A copy of the original dataframe, with the alterations done by the function.
+            (When inplace is False)
         None
             When inplace is True
     """
-    if(G == None):
-        if(bbox == None):
+    if(G is None):
+        if(bbox is None):
             bbox = move_data.get_bbox()
-        G = ox.graph_from_bbox(bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private')
-    elif(place != None):
+        G = ox.graph_from_bbox(
+            bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private'
+        )
+    elif(place is not None):
         G = ox.footprints_from_place(place=place, network_type='all_private')
 
     if not inplace:
         move_data = move_data[:]
 
-    edges = ox.get_nearest_edges(G,X=move_data['lon'],Y=move_data['lat'], method='kdtree')
+    edges = ox.get_nearest_edges(
+        G, X=move_data['lon'], Y=move_data['lat'], method='kdtree'
+    )
     gdf_edges = ox.graph_to_gdfs(G, nodes=False)
 
-    geometrys = []
+    geometries = []
     for e in edges:
         df_edges = gdf_edges[(gdf_edges['u'] == e[0]) & (gdf_edges['v'] == e[1])]
-        geometrys.append(df_edges['geometry'])
+        geometries.append(df_edges['geometry'])
 
     move_data['edge'] = [*map(lambda x: tuple([x[0], x[1]]), edges)]
-    move_data['geometry'] = geometrys
+    move_data['geometry'] = geometries
 
     if not inplace:
         return move_data
