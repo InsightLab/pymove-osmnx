@@ -15,6 +15,9 @@ jobs:
       uses: actions/setup-python@main
       with:
         python-version: 3.7
+    - name: OSMnx dependencies
+      run: |
+        sudo apt install -y libspatialindex-dev
     - name: Install dependencies
       run: |
         python -m pip install --upgrade "pip<20"
