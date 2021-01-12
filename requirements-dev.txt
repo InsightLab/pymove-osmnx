@@ -1,0 +1,8 @@
+-e .
+pre-commit
+bump2version
+flake8
+pytest
+coverage
+sphinx
+sphinx_rtd_theme
