@@ -17,7 +17,7 @@ DEPENDENCIES = [
 
 setup(
     name='pymove-osmnx',
-    version='0.0.1',
+    version='0.2.0',
     author='Insight Data Science Lab',
     author_email='insightlab@dc.ufc.br',
     license='MIT',
