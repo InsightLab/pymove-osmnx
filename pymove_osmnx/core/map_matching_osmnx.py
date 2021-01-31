@@ -38,7 +38,7 @@ def map_matching_node(
             bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private'
         )
     elif(place is not None):
-        G = ox.footprints_from_place(place=place, network_type='all_private')
+        G = ox.footprints_from_place(query=place, tags={'network_type': 'all_private'})
 
     if not inplace:
         move_data = move_data[:]
@@ -95,7 +95,7 @@ def map_matching_edge(
             bbox[0], bbox[2], bbox[1], bbox[3], network_type='all_private'
         )
     elif(place is not None):
-        G = ox.footprints_from_place(place=place, network_type='all_private')
+        G = ox.footprints_from_place(query=place, tags={'network_type': 'all_private'})
 
     if not inplace:
         move_data = move_data[:]
@@ -107,7 +107,10 @@ def map_matching_edge(
 
     geometries = []
     for e in edges:
-        df_edges = gdf_edges[(gdf_edges['u'] == e[0]) & (gdf_edges['v'] == e[1])]
+        df_edges = gdf_edges[
+            (gdf_edges.index.get_level_values('u') == e[0])
+            & (gdf_edges.index.get_level_values('v') == e[1])
+        ]
         geometries.append(df_edges['geometry'])
 
     move_data['edge'] = [*map(lambda x: tuple([x[0], x[1]]), edges)]

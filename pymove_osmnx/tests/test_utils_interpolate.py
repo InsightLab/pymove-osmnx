@@ -4,6 +4,7 @@ from pymove.core.dataframe import MoveDataFrame
 
 from pymove_osmnx.utils.interpolate import (
     check_time_dist,
+    feature_values_using_filter,
     fix_time_not_in_ascending_order_all,
     fix_time_not_in_ascending_order_id,
     generate_distances,
@@ -17,13 +18,25 @@ list_data = [
     [-3.779200, -38.675917, '2008-06-04 09:08:59', '1'],
 ]
 
+
+
+def _default_move_df():
+    return MoveDataFrame(
+        data=[
+            [39.984094, 116.319236, '2008-10-23 05:53:05', 1],
+            [39.984198, 116.319322, '2008-10-23 05:53:06', 1],
+            [39.984224, 116.319402, '2008-10-23 05:53:11', 1],
+            [39.984224, 116.319402, '2008-10-23 05:53:11', 2],
+        ]
+    )
+
 move_df = MoveDataFrame(
-            data=list_data,
-            latitude=0,
-            longitude=1,
-            datetime=2,
-            traj_id=3,
-        )
+    data=list_data,
+    latitude=0,
+    longitude=1,
+    datetime=2,
+    traj_id=3,
+)
 
 def test_generate_distances():
 

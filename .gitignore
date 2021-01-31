@@ -341,3 +341,4 @@ $RECYCLE.BIN/
 developing/
 examples/*
 !examples/README.md
+cache
