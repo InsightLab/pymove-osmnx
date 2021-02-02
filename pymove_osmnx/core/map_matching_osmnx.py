@@ -1,35 +1,43 @@
+from typing import Optional, Text, Tuple, Union
+
 import osmnx as ox
+from networkx import MultiDiGraph
+from pandas.core.frame import DataFrame
+from pymove import PandasMoveDataFrame
+from pymove.core.dask import DaskMoveDataFrame
+from pymove.core.pandas_discrete import PandasDiscreteMoveDataFrame
 
 
 def map_matching_node(
-    move_data,
-    inplace=True,
-    bbox=None,
-    place=None,
-    G=None
-):
-    """Generate Map matching.
-     Parameters
+    move_data: Union[PandasMoveDataFrame, DaskMoveDataFrame, PandasDiscreteMoveDataFrame],
+    inplace: Optional[bool] = True,
+    bbox: Optional[Tuple[float, float, float, float]] = None,
+    place: Optional[Text] = None,
+    G: Optional[MultiDiGraph] = None
+) -> Optional[DataFrame]:
+    """
+    Generate Map matching using the graph nodes
+
+    Parameters
     ----------
     move_data : MoveDataFrame
        The input trajectories data
-    inplace: boolean, optional(True by default)
+    inplace: bool, optional
         if set to true the original dataframe will be altered,
-        otherwise the alteration will be made in a copy, that will be returned.
-    bbox : tuple
-        The bounding box as (north, east, south, west)
-    place : string
-        The query to geocode to get place boundary polygon
-    G : networkx.MultiDiGraph
-        The input graph
+        otherwise the alteration will be made in a copy, that will be returned,
+        by default True
+    bbox : tuple, optional
+        The bounding box as (north, east, south, west), by default None
+    place : string, optional
+        The query to geocode to get place boundary polygon, by default None
+    G : MultiDiGraph, optional
+        The input graph, by default None
 
     Returns
     -------
-        move_data : MoveDataFrame
-            A copy of the original dataframe, with the alterations done by the function.
-            (When inplace is False)
-        None
-            When inplace is True
+    move_data : MoveDataFrame
+        A copy of the original dataframe or None
+
     """
     if(G is None):
         if(bbox is None):
@@ -59,34 +67,35 @@ def map_matching_node(
 
 
 def map_matching_edge(
-    move_data,
-    inplace=True,
-    bbox=None,
-    place=None,
-    G=None
-):
-    """Generate Map matching.
-     Parameters
+    move_data: Union[PandasMoveDataFrame, DaskMoveDataFrame, PandasDiscreteMoveDataFrame],
+    inplace: Optional[bool] = True,
+    bbox: Optional[Tuple[float, float, float, float]] = None,
+    place: Optional[Text] = None,
+    G: Optional[MultiDiGraph] = None
+) -> Optional[DataFrame]:
+    """
+    Generate Map matching using the graph edges
+
+    Parameters
     ----------
     move_data : MoveDataFrame
        The input trajectories data
-    inplace: boolean, optional(True by default)
+    inplace: bool, optional
         if set to true the original dataframe will be altered,
-        otherwise the alteration will be made in a copy, that will be returned.
-    bbox : tuple
-        The bounding box as (north, east, south, west)
-    place : string
-        The query to geocode to get place boundary polygon
-    G : networkx.MultiDiGraph
-        The input graph
+        otherwise the alteration will be made in a copy, that will be returned,
+        by default True
+    bbox : tuple, optional
+        The bounding box as (north, east, south, west), by default None
+    place : string, optional
+        The query to geocode to get place boundary polygon, by default None
+    G : MultiDiGraph, optional
+        The input graph, by default None
 
     Returns
     -------
-        move_data : MoveDataFrame
-            A copy of the original dataframe, with the alterations done by the function.
-            (When inplace is False)
-        None
-            When inplace is True
+    move_data : MoveDataFrame
+        A copy of the original dataframe or None
+
     """
     if(G is None):
         if(bbox is None):

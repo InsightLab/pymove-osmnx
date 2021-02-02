@@ -1,3 +1,4 @@
+import numpy as np
 from pandas import DataFrame, Timestamp
 from pandas.testing import assert_frame_equal
 from pymove.core.dataframe import MoveDataFrame
@@ -101,20 +102,26 @@ def test_generate_distances():
     assert len(move_distances) == 5
 
 def test_check_time_dist():
-    check_time = check_time_dist(generate_distances(move_df), index_name = 'id')
-
-    assert check_time == True
+    try:
+        print(generate_distances(move_df))
+        check_time_dist(generate_distances(move_df), index_name = 'id')
+    except ValueError:
+        assert False
 
 def test_fix_time_not_in_ascending_order_id():
+    time_ascending = generate_distances(move_df)
     time_ascending = fix_time_not_in_ascending_order_id(
-        generate_distances(move_df), tid='1', index_name = 'id'
+        time_ascending, id_= '1', index_name = 'id'
     )
-
-    assert time_ascending == 5
+    times = time_ascending['datetime'].values
+    assert np.all(times[1:] > times[:-1])
 
 def test_fix_time_not_in_ascending_order_all():
+    time_ascending = generate_distances(move_df)
+    b, c = time_ascending.iloc[1].copy(), time_ascending.iloc[3].copy()
+    time_ascending.iloc[3], time_ascending.iloc[1] = b, c
     time_ascending = fix_time_not_in_ascending_order_all(
-        generate_distances(move_df), index_name = 'id'
+        time_ascending, index_name = 'id'
     )
-
-    assert time_ascending == 0
+    times = time_ascending['datetime'].values
+    assert np.all(times[1:] > times[:-1])

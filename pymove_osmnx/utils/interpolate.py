@@ -1,8 +1,9 @@
 import time
+from typing import Optional, Text
 
 import numpy as np
 import osmnx as ox
-import pandas as pd
+from pandas import DataFrame, Timestamp
 from pymove.utils.constants import TID
 from pymove.utils.log import progress_bar
 from pymove.utils.trajectories import shift
@@ -15,12 +16,12 @@ from pymove_osmnx.utils.transformation import (
 
 
 def check_time_dist(
-    move_data,
-    index_name='tid',
-    tids=None,
-    max_dist_between_adj_points=5000,
-    max_time_between_adj_points=900,
-    max_speed=30
+    move_data: DataFrame,
+    index_name: Optional[Text] = TID,
+    tids: Optional[Text] = None,
+    max_dist_between_adj_points: Optional[float] = 5000,
+    max_time_between_adj_points: Optional[float] = 900,
+    max_speed: Optional[float] = 30
 ):
     """
     Used to verify that the trajectories points are in the correct order after
@@ -30,28 +31,22 @@ def check_time_dist(
     ----------
     move_data : dataframe
      The input trajectories data
-    index_name: String, optional("tid" by default)
-     The name of the column to set as the new index during function execution.
-     Indicates the tid column.
-    tids: array, optional(None by default)
-     The list of the unique keys of the index_name column.
-    max_dist_between_adj_points: double, optional(5000 by default)
-     The maximum distance between two adjacent points.
-    max_time_between_adj_points: double, optional(900 by default)
-     The maximum time interval between two adjacent points.
-    max_speed: double, optional(30 by default)
-     The maximum speed between two adjacent points.
-    inplace: boolean, optional(True by default)
-     if set to true the original dataframe will be altered,
-     otherwise the alteration will be made in a copy, that will be returned.
+    index_name: str, optional
+     The name of the column to set as the new index during function execution,
+     by default TID
+    tids: array, optional
+     The list of the unique keys of the index_name column, by default None
+    max_dist_between_adj_points: float, optional
+     The maximum distance between two adjacent points, by default 5000
+    max_time_between_adj_points: float, optional
+     The maximum time interval between two adjacent points, by default 900
+    max_speed: float, optional
+     The maximum speed between two adjacent points, by default 30
 
-    Returns
-    -------
-     move_data : dataframe
-         A copy of the original dataframe, with the alterations done by the function.
-         (When inplace is False)
-     None
-         When inplace is True
+    Raises
+    ------
+    ValueError
+        if the data is not in order
     """
     if move_data.index.name is not None:
         print('reseting index...')
@@ -73,15 +68,13 @@ def check_time_dist(
 
         # be sure that distances are in ascending order
         dists = move_data.at[tid, 'distFromTrajStartToCurrPoint'][filter_]
-        assert np.all(
-            dists[:-1] < dists[1:]
-        ), 'distance feature is not in ascending order'
+        if not np.all(dists[:-1] < dists[1:]):
+            raise ValueError('distance feature is not in ascending order')
 
         # be sure that times are in ascending order
         times = move_data.at[tid, 'datetime'][filter_].astype(int)
-        assert np.all(
-            times[:-1] < times[1:]
-        ), 'time feature is not in ascending order'
+        if not np.all(times[:-1] < times[1:]):
+            raise ValueError('time feature is not in ascending order')
 
     count = 0
 
@@ -95,37 +88,44 @@ def check_time_dist(
             :-1
         ]
 
-        assert np.all(
-            delta_dists <= max_dist_between_adj_points
-        ), 'delta_dists must be <= {}'.format(max_dist_between_adj_points)
+        if not np.all(delta_dists <= max_dist_between_adj_points):
+            raise ValueError(
+                'delta_dists must be <= {}'.format(
+                    max_dist_between_adj_points
+                )
+            )
 
         times = move_data.at[tid, 'datetime'][filter_].astype(int)
         delta_times = ((shift(times, -1) - times) / 1000.0)[
             :-1
         ]
 
-        assert np.all(
-            delta_times <= max_time_between_adj_points
-        ), 'delta_times must be <= {}'.format(max_time_between_adj_points)
+        if not np.all(delta_times <= max_time_between_adj_points):
+            raise ValueError(
+                'delta_times must be <= {}'.format(
+                    max_time_between_adj_points
+                )
+            )
 
-        assert np.all(delta_times > 0), 'delta_times must be > 0'
-
-        assert np.all(delta_dists > 0), 'delta_dists must be > 0'
+        if not np.all(delta_times > 0):
+            raise ValueError('delta_times must be > 0')
 
         speeds = delta_dists / delta_times
-        assert np.all(speeds <= max_speed), 'speeds > {}'.format(max_speed)
+        if not np.all(speeds <= max_speed):
+            raise ValueError('speeds > {}'.format(max_speed))
 
         size_id = 1 if filter_.shape == () else filter_.shape[0]
         count += size_id
 
     move_data.reset_index(inplace=True)
 
-    return True
-
 
 def fix_time_not_in_ascending_order_id(
-    move_data, tid, index_name='tid', inplace=True
-):
+    move_data: DataFrame,
+    id_: Text,
+    index_name: Optional[Text] = TID,
+    inplace: Optional[bool] = True
+) -> Optional[DataFrame]:
     """
     Used to correct time order between points of a  trajectory, after map
     matching operations.
@@ -134,25 +134,24 @@ def fix_time_not_in_ascending_order_id(
     ----------
     move_data : dataframe
        The input trajectories data
-    tid : String
+    id_ : str
         The tid of the trajectory the user want to correct.
-    index_name: String, optional("tid" by default)
+    index_name: str, optional
         The name of the column to set as the new index during function execution.
-        Indicates the tid column.
-    inplace: boolean, optional(True by default)
+        Indicates the tid column, by default TID
+    inplace: boolean, optional
         if set to true the original dataframe will be altered,
-        otherwise the alteration will be made in a copy, that will be returned.
+        otherwise the alteration will be made in a copy, that will be returned,
+        by default True
 
     Returns
     -------
-        move_data : dataframe
-            A copy of the original dataframe, with the alterations done by the function.
-            (When inplace is False)
-        size_id
+    DataFrame
+        Dataframe sorted by time on id_ or none
 
     Notes
     -----
-    Do not use trajectories with only 1 point.
+        Do not use trajectories with only 1 point.
     """
 
     if not inplace:
@@ -167,25 +166,18 @@ def fix_time_not_in_ascending_order_id(
 
     move_data['isNone'] = move_data['datetime'].isnull()
 
-    filter_ = move_data.at[tid, 'isNone'] & ~move_data.at[tid, 'deleted']
-
-    dists = move_data.at[tid, 'distFromTrajStartToCurrPoint'][filter_]
-    assert np.all(
-        dists[:-1] <= dists[1:]
-    ), 'distance feature is not in ascending order'
+    filter_ = move_data.at[id_, 'isNone'] & ~move_data.at[id_, 'deleted']
 
     if filter_.shape == ():
-        size_id = 1
-        move_data.at[tid, 'deleted'] = True
+        move_data.at[id_, 'deleted'] = True
     else:
-        size_id = filter_.shape[0]
-        times = move_data.at[tid, 'datetime'][filter_]
+        times = move_data.at[id_, 'datetime'][filter_]
         idx_not_in_ascending_order = np.where(times[:-1] >= times[1:])[0] + 1
 
         if idx_not_in_ascending_order.shape[0] > 0:
             move_data.feature_values_using_filter_and_indexes(
                 move_data,
-                tid,
+                id_,
                 'deleted',
                 filter_,
                 idx_not_in_ascending_order,
@@ -193,18 +185,19 @@ def fix_time_not_in_ascending_order_id(
             )
 
             fix_time_not_in_ascending_order_id(
-                move_data, tid, index_name=index_name
+                move_data, id_, index_name=index_name
             )
 
     if inplace:
-        return size_id
-    else:
-        return move_data, size_id
+        return move_data
 
 
 def fix_time_not_in_ascending_order_all(
-    move_data, index_name='tid', drop_marked_to_delete=False, inplace=True
-):
+    move_data: DataFrame,
+    index_name: Optional[Text] = TID,
+    drop_marked_to_delete: Optional[bool] = False,
+    inplace: Optional[bool] = True
+) -> Optional[DataFrame]:
     """
     Used to correct time order between points of the trajectories, after map
     matching operations.
@@ -213,21 +206,20 @@ def fix_time_not_in_ascending_order_all(
     ----------
     move_data : dataframe
        The input trajectories data
-    index_name: String, optional("tid" by default)
-        The name of the column to set as the new index during function execution.
-    drop_marked_to_delete: boolean, optional (False by default)
-        Indicates if rows marked as deleted should be dropped.
-    inplace: boolean, optional(True by default)
+    index_name: str, optional
+        The name of the column to set as the new index during function execution,
+        by default TID
+    drop_marked_to_delete: boolean, optional
+        Indicates if rows marked as deleted should be dropped, by default False
+    inplace: boolean, optional
         if set to true the original dataframe will be altered,
-        otherwise the alteration will be made in a copy, that will be returned.
+        otherwise the alteration will be made in a copy, that will be returned,
+        by default True
 
     Returns
     -------
-        move_data : dataframe
-            A copy of the original dataframe, with the alterations done by the function.
-            (When inplace is False)
-        None
-            When inplace is True
+    DataFrame
+        Dataframe sorted by time or none
     """
 
     if not inplace:
@@ -275,44 +267,42 @@ def fix_time_not_in_ascending_order_all(
         print('shape after dropping: {}'.format(move_data.shape))
 
     if inplace:
-        return size_idx
-    else:
-        return move_data, size_idx
+        return move_data
 
 
 def interpolate_add_deltatime_speed_features(
-    move_data,
-    label_tid='tid',
-    max_time_between_adj_points=900,
-    max_dist_between_adj_points=5000,
-    max_speed=30,
-    inplace=True,
-):
-    """Use to interpolate distances (x) to find times (y).
+    move_data: DataFrame,
+    label_tid: Optional[Text] = TID,
+    max_dist_between_adj_points: Optional[float] = 5000,
+    max_time_between_adj_points: Optional[float] = 900,
+    max_speed: Optional[float] = 30,
+    inplace: Optional[bool] = True
+) -> Optional[DataFrame]:
+    """
+    Use to interpolate distances (x) to find times (y).
+
      Parameters
     ----------
     move_data : dataframe
        The input trajectories data
-    label_tid: String, optional("tid" by default)
+    label_tid: str, optional("tid" by default)
         The name of the column to set as the new index during function execution.
         Indicates the tid column.
-    max_dist_between_adj_points: double, optional(5000 by default)
-        The maximum distance between two adjacent points. Used only for verification.
-    max_time_between_adj_points: double, optional(900 by default)
-        The maximum time interval between two adjacent points. Used only for verification.
-    max_speed: double, optional(30 by default)
-        The maximum speed between two adjacent points. Used only for verification.
-    inplace: boolean, optional(True by default)
+        max_dist_between_adj_points: float, optional
+     The maximum distance between two adjacent points, by default 5000
+    max_time_between_adj_points: float, optional
+     The maximum time interval between two adjacent points, by default 900
+    max_speed: float, optional
+     The maximum speed between two adjacent points, by default 30
+    inplace: boolean, optional
         if set to true the original dataframe will be altered,
-        otherwise the alteration will be made in a copy, that will be returned.
+        otherwise the alteration will be made in a copy, that will be returned,
+        by default True
 
     Returns
     -------
-        move_data : dataframe
-            A copy of the original dataframe, with the alterations done by the function.
-            (When inplace is False)
-        None
-            When inplace is True
+    DataFrame
+        A copy of the original dataframe or None
     """
 
     if not inplace:
@@ -433,7 +423,7 @@ def interpolate_add_deltatime_speed_features(
         move_data['datetime'] = None
         datetime = []
         for d in move_data['time'].values:
-            data = pd.Timestamp(int(d), unit='s', tz='America/Fortaleza')
+            data = Timestamp(int(d), unit='s', tz='America/Fortaleza')
             datetime.append(str(data)[:-6])
         move_data['datetime'] = datetime
 
@@ -470,25 +460,23 @@ def interpolate_add_deltatime_speed_features(
 
 
 def generate_distances(
-    move_data,
-    inplace=False
-):
+    move_data: DataFrame,
+    inplace: Optional[bool] = False
+) -> Optional[DataFrame]:
     """Use generate columns distFromTrajStartToCurrPoint and edgeDistance.
      Parameters
     ----------
     move_data : dataframe
        The input trajectories data
-    inplace: boolean, optional(True by default)
+    inplace: boolean, optional
         if set to true the original dataframe will be altered,
-        otherwise the alteration will be made in a copy, that will be returned.
+        otherwise the alteration will be made in a copy, that will be returned,
+        by default True
 
     Returns
     -------
-        move_data : dataframe
-            A copy of the original dataframe, with the alterations
-            done by the function. (When inplace is False)
-        None
-            When inplace is True
+    DataFrame
+        A copy of the original dataframe or None
     """
     if not inplace:
         move_data = move_data.copy()

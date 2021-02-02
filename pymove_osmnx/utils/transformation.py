@@ -1,37 +1,39 @@
+from typing import Any, List, Optional, Text, Union
+
+from pandas.core.frame import DataFrame
 
 
 def feature_values_using_filter(
-    move_data, id_, feature_name, filter_, values, inplace=True
-):
+    move_data: DataFrame,
+    id_: Union[Text, int],
+    feature_name: Text,
+    filter_: List,
+    values: Any,
+    inplace: Optional[bool] = True
+) -> Optional[DataFrame]:
     """
     Changes the values of the feature defined by the user.
     Parameters
     ----------
-    move_data : dataframe
+    move_data : DataFrame
        The input trajectories data.
-    id_ : String
+    id_ : str
         Indicates the index to be changed.
-    feature_name : String
+    feature_name : str
         The name of the column that the user wants to change values for.
-    filter_ : Array
+    filter_ : list or array
         Indicates the rows with the index "id_" of the "feature_name"
         that must be changed.
-    values : ?
+    values : any
         THe new values to be set to the selected feature.
     inplace: boolean, optional(True by default)
         if set to true the original dataframe will be altered,
         otherwise the alteration will be made in a copy, that will be returned.
     Returns
     -------
-    dataframe or None
-        A copy of the original dataframe, with the alterations done
-        by the function. (When inplace is False)
-    Notes
-    -----
-    equivalent to: move_data.at[id_, feature_name][filter_] = values
-    e.g. move_data.at[tid, "time"][filter_nodes] = intp_result.astype(np.int64)
-    dataframe must be indexed by id_:
-    move_data.set_index(index_name, inplace=True)
+    DataFrame
+        A copy of the original dataframe or None
+
     """
 
     if not inplace:
@@ -52,7 +54,13 @@ def feature_values_using_filter(
 
 
 def feature_values_using_filter_and_indexes(
-    move_data, id_, feature_name, filter_, idxs, values, inplace=True
+    move_data: DataFrame,
+    id_: Union[int, Text],
+    feature_name: Text,
+    filter_: List,
+    idxs: List,
+    values: Any,
+    inplace: Optional[bool] = True
 ):
     """
     Create or update move and stop by radius.
@@ -60,27 +68,26 @@ def feature_values_using_filter_and_indexes(
     ----------
     move_data : dataframe
        The input trajectories data.
-    id_ : String
+    id_ : str
         Indicates the index to be changed.
-    feature_name : String
+    feature_name : str
         The name of the column that the user wants to change values for.
-    filter_ : Array
+    filter_ : array
         Indicates the rows with the index "id_" of the "feature_name"
         that must be changed.
     idxs : array like of indexes
         Indexes to atribute value
-    values : array like
+    values : any
         The new values to be set to the selected feature.
-    inplace: boolean, optional(True by default)
+    inplace: bool, optional
         if set to true the original dataframe will be altered,
-        otherwise the alteration will be made in a copy, that will be returned.
-    move_data : pandas.core.frame.DataFrame
-        Represents the dataset with contains lat, long and datetime.
+        otherwise the alteration will be made in a copy, that will be returned,
+        by default True
+
     Returns
     -------
-    dataframe or None
-        A copy of the original dataframe, with the alterations
-        done by the function. (When inplace is False)
+    DataFrame
+        A copy of the original dataframe or None
     """
 
     if not inplace:
