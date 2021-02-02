@@ -8,6 +8,11 @@ from pymove.utils.log import progress_bar
 from pymove.utils.trajectories import shift
 from scipy.interpolate import interp1d
 
+from pymove_osmnx.utils.transformation import (
+    feature_values_using_filter,
+    feature_values_using_filter_and_indexes,
+)
+
 
 def check_time_dist(
     move_data,
@@ -518,55 +523,6 @@ def generate_distances(
 
     move_data['edgeDistance'] = edgeDistance
     move_data['distFromTrajStartToCurrPoint'] = distances
-
-    if not inplace:
-        return move_data
-
-
-def feature_values_using_filter(
-    move_data, id_, feature_name, filter_, values, inplace=True
-):
-    """
-    Changes the values of the feature defined by the user.
-    Parameters
-    ----------
-    move_data : dataframe
-       The input trajectories data.
-    id_ : String
-        Indicates the index to be changed.
-    feature_name : String
-        The name of the column that the user wants to change values for.
-    filter_ : Array
-        Indicates the rows with the index "id_" of the "feature_name"
-        that must be changed.
-    values : ?
-        THe new values to be set to the selected feature.
-    inplace: boolean, optional(True by default)
-        if set to true the original dataframe will be altered,
-        otherwise the alteration will be made in a copy, that will be returned.
-    Returns
-    -------
-    dataframe or None
-        A copy of the original dataframe, with the alterations done
-        by the function. (When inplace is False)
-    Notes
-    -----
-    equivalent to: move_data.at[id_, feature_name][filter_] = values
-    e.g. move_data.at[tid, "time"][filter_nodes] = intp_result.astype(np.int64)
-    dataframe must be indexed by id_:
-    move_data.set_index(index_name, inplace=True)
-    """
-
-    if not inplace:
-        move_data = move_data.copy()
-
-    values_feature = move_data.at[id_, feature_name]
-
-    if filter_.shape == () or values_feature.shape == ():
-        move_data.at[id_, feature_name] = values
-    else:
-        values_feature[filter_] = values
-        move_data.at[id_, feature_name] = values_feature
 
     if not inplace:
         return move_data

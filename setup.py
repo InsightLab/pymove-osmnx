@@ -10,9 +10,8 @@ except Exception as e:
     raise e
 
 DEPENDENCIES = [
-    'pymove',
-    'pandas',
-    'osmnx'
+    'pymove>=2.5.0',
+    'osmnx>=1.0.0'
 ]
 
 setup(
@@ -29,7 +28,7 @@ setup(
     packages=[
         'pymove_osmnx',
         'pymove_osmnx.core',
-        'pymove_osmnx.utils'
+        'pymove_osmnx.utils',
     ],
     classifiers=[
         'Development Status :: 1 - Planning',
