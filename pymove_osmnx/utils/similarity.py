@@ -1,33 +1,35 @@
 from difflib import SequenceMatcher
+from typing import Optional
 
 import pandas as pd
+from pandas.core.frame import DataFrame
 
 from pymove_osmnx.core.map_matching_osmnx import map_matching_edge
 
 
 def generate_lcss(
-    move_data_id1,
-    move_data_id2,
-    tolerance
-):
-    """Generate Longest Commum Sub-Sequence between two trajectories.
+    move_data_id1: DataFrame,
+    move_data_id2: DataFrame,
+    tolerance: float
+) -> Optional[DataFrame]:
+    """
+    Generate Longest Commum Sub-Sequence between two trajectories.
+
      Parameters
     ----------
-    move_data_id1 : MoveDataFrame
+    move_data_id1 : DataFrame
        The input trajectories data
-    move_data_id2 : MoveDataFrame
+    move_data_id2 : DataFrame
        The input trajectories data
-    tolerance : int
+    tolerance : float
         Time in seconds regarding the tolerance of the time difference
         between a move_data_id1 and move_data_id2 point
 
     Returns
     -------
-        move_data : MoveDataFrame
-            A move_data containing the largest sub-sequence between
-            move_data_id1 and move_data_id1.
-        None
-            When there is no sub-sequence.
+    DataFrame
+        A move_data containing the largest sub-sequence between
+        move_data_id1 and move_data_id1, or None
     """
 
     move_data_id1 = map_matching_edge(move_data_id1, inplace=False)

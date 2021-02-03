@@ -6,4 +6,4 @@ spatial-temporal data
 """
 from ._version import __version__
 from .core import map_matching_osmnx
-from .utils import interpolate, similarity
+from .utils import interpolate, similarity, transformation
