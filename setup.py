@@ -10,7 +10,7 @@ except Exception as e:
     raise e
 
 DEPENDENCIES = [
-    'pymove>=2.5.0',
+    'pymove>=2.6.1',
     'osmnx>=1.0.0'
 ]
 
